@@ -13,3 +13,4 @@ def solve(balance, annualInterestRate):
             minimumFixedMonthlyPayment += 10
     print("Lowest Payment:", minimumFixedMonthlyPayment)
 
+solve(3330, 0.2)
