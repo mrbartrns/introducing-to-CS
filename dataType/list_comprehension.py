@@ -15,4 +15,4 @@ namesDict = {"Nora": 90, "Lulu": 15, "Gino": 60}
 doubleGrades = {key: value*2 for (key, value) in namesDict.items() if value % 2 == 0}
 print(doubleGrades)
 animals = {'a': 'aardvark', 'b': 'baboon', 'c': 'coati'}
-len(animals)
+print('baboon' in animals)
