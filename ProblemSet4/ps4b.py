@@ -100,7 +100,7 @@ def compPlayHand(hand, wordList, n):
 # Problem #6: Playing a game
 #
 #
-def playGame(wordList):
+def comPlayGame(wordList):
     """
     Allow the user to play an arbitrary number of hands.
  
@@ -124,15 +124,52 @@ def playGame(wordList):
 
     wordList: list (string)
     """
-    # TO DO... <-- Remove this comment when you code this function
-    print("playGame not yet implemented.") # <-- Remove this when you code this function
-
+    running = True
+    asking = True
+    comAsking = True
+    hand = {}
+    n = HAND_SIZE
+    while running:
+        while asking:
+            userInput = input("Enter n to deal a new hand, r to replay the last hand, or e to end game: ")
+            print("")
+            if userInput == 'n':
+                hand = dealHand(n)
+                asking = False
+            elif userInput == 'r':
+                if not hand:
+                    print("You have not played a hand yet. Please play a new hand first!\n")
+                else:
+                    asking = False
+            elif userInput == 'e':
+                asking = False
+                running = False
+                comAsking = False
+            else:
+                print('Invalid command.\n')
+        while comAsking:
+            comUserInput = input("Enter u to have yourself play, c to have the computer play: ")
+            print("")
+                if comUserInput == 'u':
+                    comAsking = False
+                elif comUserInput == 'c':
+                    comAsking = False
+            else:
+                print("Invalid command.\n")            
+        if running:
+            copy = hand.copy()
+            if comUserInput == 'u':
+                playHand(copy, wordList, n)
+            elif comUserInput == 'c':
+                compPlayHand(copy, wordList, n)
+            asking = True
+            comAsking = True
         
 #
 # Build data structures used for entire session and play game
 #
 if __name__ == '__main__':
     wordList = loadWords()
-    playGame(wordList)
+    comPlayGame(wordList)
 
 
