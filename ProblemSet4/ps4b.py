@@ -150,10 +150,10 @@ def comPlayGame(wordList):
         while comAsking:
             comUserInput = input("Enter u to have yourself play, c to have the computer play: ")
             print("")
-                if comUserInput == 'u':
-                    comAsking = False
-                elif comUserInput == 'c':
-                    comAsking = False
+            if comUserInput == 'u':
+                comAsking = False
+            elif comUserInput == 'c':
+                comAsking = False
             else:
                 print("Invalid command.\n")            
         if running:
