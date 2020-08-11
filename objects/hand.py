@@ -71,7 +71,7 @@ class Hand(object):
 
     def update(self, word):
         """
-        Does not assume that self.hand has all the letters in word.
+        Does not assume that self.hand has all the letters in word. > self.hand is in method(dealNewHand()) {'a': 2, 'b': 3}...
 
         Updates the hand: if self.hand does have all the letters to make
         the word, modifies self.hand by using up the letters in the given word.
@@ -83,16 +83,24 @@ class Hand(object):
         returns: Boolean (if the word was or was not made)
         """
         # Your code here
-        raise NotImplementedError()
+        assert self.hand != {}
+        for c in word:
+            if c not in self.hand or self.hand[c] == 0:
+                print(self.hand)
+                return False
+            else:
+                self.hand[c] -= 1
+                print(self.hand)
+                return True
 
-    
 myHand = Hand(7)
 print(myHand)
+"""
 print(myHand.calculateLen())
 
 myHand.setDummyHand('aazzmsp')
 print(myHand)
 print(myHand.calculateLen())
-
-myHand.update('za')
+"""
+print(myHand.update('ea'))
 print(myHand)
