@@ -65,3 +65,11 @@ print(m3.getIdNum(), m2.getIdNum(), m1.getIdNum())
 a = ['a', 'b', 'd', 'c']
 a.sort()
 print(a)
+
+print(ord('a'))
+print(ord('z'))
+print(chr(ord('z') + 1 - 26))
+
+a = {'a': 1, 'b': 2}
+for key in a:
+    print(a[key])
