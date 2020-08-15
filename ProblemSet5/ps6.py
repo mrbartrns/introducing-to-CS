@@ -133,7 +133,7 @@ class Message(object):
              down the alphabet by the input shift
         '''
         self.shift = shift
-        self.message_text_encrypted = []
+        self.message_text_encrypted = [] # hi hi > jk jk
         self.get_message_text()
         for c in self.get_message_text():
             if c in self.build_shift_dict(self.shift):
@@ -216,7 +216,7 @@ class CiphertextMessage(Message):
             self.message_text (string, determined by input text)
             self.valid_words (list, determined using helper function load_words)
         '''
-        pass #delete this line and replace with your code here
+        Message.__init__(self, text)
 
     def decrypt_message(self):
         '''
@@ -234,22 +234,57 @@ class CiphertextMessage(Message):
         Returns: a tuple of the best shift value used to decrypt the message
         and the decrypted message text using that shift value
         '''
-        pass #delete this line and replace with your code here
+        self.s = 25 # shift
+        self.shifts = ()
+        len_possible_words = 0
+        save_shift = 0
+        while self.s >= 0:
+            self.decrypted_text = Message.apply_shift(self, self.s)
+            words = self.decrypted_text.split(' ')
+            save_len = 0
+            for word in words:
+                if is_word(self.get_valid_words(), word):
+                    save_len += 1
+                if save_len == len(words):
+                    self.shifts += (self.s, (' ').join(words))
+                    return self.shifts
+                # len_possible_words가 큰 값을 비교하여 이것보다 크면 그때의 길이를 저장하고, s값도 저장한다.
+                else:
+                    if len_possible_words < save_len:
+                        len_possible_words = save_len
+                        save_shift = self.s
+            self.s -= 1
+        self.decrypted_text = Message.apply_shift(self, save_shift)
+        # words = self.decrypted_text.split(' ')
+        # valid_text = (' ').join(words)
+        self.shifts += (save_shift, self.decrypted_text)
+        return self.shifts
 
-#Example test case (PlaintextMessage)
-plaintext = PlaintextMessage('hello', 2)
-print('Expected Output: jgnnq')
-print('Actual Output:', plaintext.get_message_text_encrypted())
+def decrypt_story():
+    story = get_story_string() # encrypted text
+    story_text = CiphertextMessage(story)
+    return story_text.decrypt_message()
+
+print(decrypt_story())
+
+
+
+# #Example test case (PlaintextMessage)
+# story = 'Message is Nonsense words: blue dinner unite push price new indoor headache moderate across way quiz thicken thick female'
+# plaintext = PlaintextMessage(story, 2)
+# print('Expected Output: jgnnq pcgon')
+# print('Actual Output:', plaintext.get_message_text_encrypted())
+# text = plaintext.get_message_text_encrypted()
     
-#Example test case (CiphertextMessage)
-ciphertext = CiphertextMessage('jgnnq')
-print('Expected Output:', (24, 'hello'))
-print('Actual Output:', ciphertext.decrypt_message())
+# #Example test case (CiphertextMessage)
+# ciphertext = CiphertextMessage(text)
+# print('Expected Output:', (24, 'hello'))
+# print('Actual Output:', ciphertext.decrypt_message())
 
-wordList = load_words("ProblemSet5/words.txt")
-print(is_word(wordList, 'hi'))
-print(get_story_string())
+# wordList = load_words("ProblemSet5/words.txt")
+# print(is_word(wordList, 'hi'))
+# print(get_story_string())
 
-a = Message('hi')
+# a = Message('hi')
 
-print(a.build_shift_dict(25))
+# print(a.build_shift_dict(25))
