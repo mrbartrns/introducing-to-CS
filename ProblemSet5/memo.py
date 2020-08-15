@@ -1,33 +1,3 @@
-# import string
-
-# def buildShiftDict(shift):
-#     shiftedDict = {}
-#     ALPHABET_LENGTH = 26
-#     for c in string.ascii_uppercase:
-#         if ord(c) + shift > ord('Z'):
-#             shiftedDict[c] = chr(ord(c) + shift -ALPHABET_LENGTH)
-#         else:
-#             shiftedDict[c] = chr(ord(c) + shift)
-#     for c in string.ascii_lowercase:
-#         if ord(c) + shift > ord('z'):
-#             shiftedDict[c] = chr(ord(c) + shift -ALPHABET_LENGTH)
-#         else:
-#             shiftedDict[c] = chr(ord(c) + shift)
-#     return shiftedDict
-
-# def applyShift(text: str, shiftedDict: dict) -> str:
-#     encryptedChars = []
-#     for c in text:
-#         if c in shiftedDict:
-#             encryptedChars.append(shiftedDict[c])
-#         else:
-#             encryptedChars.append(c)
-    
-#     return ('').join(encryptedChars)
-
-# d = buildShiftDict(2)
-# a = applyShift('hi hi', d)
-# print(a)
 import string
 
 ### DO NOT MODIFY THIS FUNCTION ###
@@ -134,21 +104,21 @@ class Message(object):
                  another letter (string). 
         '''
         self.shift = shift
-        self.originalDict = {}
+        self.encrypting_dict = {}
         ALPHABET_LENGTH = 26
         # make original dictionary {'a': 'c'} if shift 2
         for c in string.ascii_uppercase:
             if ord(c) + self.shift > ord('Z'):
-                self.originalDict[c] = chr(ord(c) + self.shift - ALPHABET_LENGTH)
+                self.encrypting_dict[c] = chr(ord(c) + self.shift - ALPHABET_LENGTH)
             else:
-                self.originalDict[c] = chr(ord(c) + self.shift)
+                self.encrypting_dict[c] = chr(ord(c) + self.shift)
 
         for c in string.ascii_lowercase:
             if ord(c) + self.shift > ord('z'):
-                self.originalDict[c] = chr(ord(c) + self.shift - ALPHABET_LENGTH)
+                self.encrypting_dict[c] = chr(ord(c) + self.shift - ALPHABET_LENGTH)
             else:
-                self.originalDict[c] = chr(ord(c) + self.shift)
-        return self.originalDict
+                self.encrypting_dict[c] = chr(ord(c) + self.shift)
+        return self.encrypting_dict
 
     def apply_shift(self, shift):
         '''
@@ -163,16 +133,16 @@ class Message(object):
              down the alphabet by the input shift
         '''
         self.shift = shift
-        self.encryptedChars = []
+        self.message_text_encrypted = [] # hi hi > jk jk
         self.get_message_text()
         for c in self.get_message_text():
             if c in self.build_shift_dict(self.shift):
                 newChar = self.build_shift_dict(self.shift)[c]
-                self.encryptedChars.append(newChar)
+                self.message_text_encrypted.append(newChar)
             else:
-                self.encryptedChars.append(c)
+                self.message_text_encrypted.append(c)
                 
-        return ('').join(self.encryptedChars)
+        return ('').join(self.message_text_encrypted)
 
 class PlaintextMessage(Message):
     def __init__(self, text, shift):
@@ -196,17 +166,96 @@ class PlaintextMessage(Message):
         self.shift = shift
 
     def get_shift(self):
+        '''
+        Used to safely access self.shift outside of the class
+        
+        Returns: self.shift
+        '''
         return self.shift
+
+    def get_encrypting_dict(self):
+        '''
+        Used to safely access a copy self.encrypting_dict outside of the class
+        
+        Returns: a COPY of self.encrypting_dict
+        '''
+        self.encrypting_dict = Message.build_shift_dict(self, self.shift)
+
+        return self.encrypting_dict.copy()
 
     def get_message_text_encrypted(self):
         '''
         Used to safely access self.message_text_encrypted outside of the class
-
+        
         Returns: self.message_text_encrypted
         '''
         return Message.apply_shift(self, self.shift)
 
-a = {'a': 1, 'b': 2}
-b = a.copy()
-a['c'] = 3
-print(b)
+    def change_shift(self, shift):
+        '''
+        Changes self.shift of the PlaintextMessage and updates other 
+        attributes determined by shift (ie. self.encrypting_dict and 
+        message_text_encrypted).
+        
+        shift (integer): the new shift that should be associated with this message.
+        0 <= shift < 26
+
+        Returns: nothing
+        '''
+        self.shift = shift
+
+
+class CiphertextMessage(Message):
+    def __init__(self, text):
+        '''
+        Initializes a CiphertextMessage object
+                
+        text (string): the message's text
+
+        a CiphertextMessage object has two attributes:
+            self.message_text (string, determined by input text)
+            self.valid_words (list, determined using helper function load_words)
+        '''
+        Message.__init__(self, text)
+
+    def decrypt_message(self):
+        '''
+        Decrypt self.message_text by trying every possible shift value
+        and find the "best" one. We will define "best" as the shift that
+        creates the maximum number of real words when we use apply_shift(shift)
+        on the message text. If s is the original shift value used to encrypt
+        the message, then we would expect 26 - s to be the best shift value 
+        for decrypting it.
+
+        Note: if multiple shifts are  equally good such that they all create 
+        the maximum number of you may choose any of those shifts (and their
+        corresponding decrypted messages) to return
+
+        Returns: a tuple of the best shift value used to decrypt the message
+        and the decrypted message text using that shift value
+        '''
+        self.s = 25 # shift
+        self.shifts = ()
+        len_possible_words = 0
+        save_shift = 0
+        while self.s >= 0:
+            self.decrypted_text = Message.apply_shift(self, self.s)
+            words = self.decrypted_text.split(' ')
+            save_len = 0
+            for word in words:
+                if is_word(self.get_valid_words(), word):
+                    save_len += 1
+                if save_len == len(words):
+                    self.shifts += (self.s, (' ').join(words))
+                    return self.shifts
+                # len_possible_words가 큰 값을 비교하여 이것보다 크면 그때의 길이를 저장하고, s값도 저장한다.
+                else:
+                    if len_possible_words < save_len:
+                        len_possible_words = save_len
+                        save_shift = self.s
+            self.s -= 1
+        self.decrypted_text = Message.apply_shift(self, save_shift)
+        # words = self.decrypted_text.split(' ')
+        # valid_text = (' ').join(words)
+        self.shifts += (save_shift, self.decrypted_text)
+        return self.shifts
